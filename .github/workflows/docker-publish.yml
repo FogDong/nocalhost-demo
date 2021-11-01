@@ -18,8 +18,8 @@ jobs:
     env:
       IMAGE: ghcr.io/fogdong/nocalhost-demo
     if: |
-      !contains(github.event.head_commit.message, 'Update image automatically') ||
-      contains(github.event.head_commit.message, 'skip')
+      !contains(github.event.head_commit.message, 'Update image automatically') &&
+      !contains(github.event.head_commit.message, 'skip')
 
     steps:
     - name: Generate build ID
