@@ -1,0 +1,16 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: infra-gitops
+spec:
+  components:
+  - name: database-config
+    type: kustomize
+    properties:
+      repoType: git
+      url: https://github.com/FogDong/nocalhost-demo
+      secretRef: git-secret
+      pullInterval: 10m
+      git:
+        branch: master
+      path: ./release/infrastructure

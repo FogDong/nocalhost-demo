@@ -1,0 +1,86 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: my-app
+spec:
+  components:
+    - name: my-server
+      type: webservice
+      properties:
+        image: crccheck/hello-world # {"$imagepolicy": "default:app-gitops"}
+        port: 9080
+      traits:
+        - type: nocalhost
+          properties:
+            port: 9080
+            gitUrl: https://github.com/FogDong/nocalhost-demo.git
+            image: go
+            debug:
+              remoteDebugPort: 9009
+        - type: ingress
+          properties:
+            domain: dev.cc502b2b97a5c4f16a1d01f9217926e85.cn-hongkong.alicontainer.com
+            http:
+              /: 9080
+
+  policies:
+    - name: multi-env-policy
+      type: env-binding
+      properties:
+        envs:
+          - name: dev
+            placement:
+              clusterSelector:
+                name: cluster-dev
+            selector:
+              components:
+                - my-server
+
+          - name: prod
+            placement:
+              clusterSelector:
+                name: cluster-prod
+            patch:
+              components:
+                - name: my-server
+                  type: webservice
+                  traits:
+                    - type: ingress
+                      properties:
+                        domain: prod.ca89a4a90fcd345029f1a89d36ecdc6f9.cn-hongkong.alicontainer.com
+  workflow:
+    steps:
+      - name: deploy-dev
+        type: deploy2env
+        properties:
+          policy: multi-env-policy
+          env: dev
+      - name: dev-notification
+        type: webhook-notification
+        properties:
+          slack:
+            url:
+              fromSecret:
+                name: my-secret
+                key: slack
+            message:
+              text: "Successfully apply the app in dev cluster."
+
+      - name: manual-approval
+        type: suspend
+
+      - name: deploy-prod
+        type: deploy2env
+        properties:
+          policy: multi-env-policy
+          env: prod
+      - name: prod-notification
+        type: webhook-notification
+        properties:
+          slack:
+            url:
+              fromSecret:
+                name: my-secret
+                key: slack
+            message:
+              text: "Successfully apply the app in prod cluster."
