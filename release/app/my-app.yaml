@@ -7,7 +7,7 @@ spec:
     - name: my-server
       type: webservice
       properties:
-        image: crccheck/hello-world # {"$imagepolicy": "default:app-gitops"}
+        image: ghcr.io/fogdong/nocalhost-demo:master-85e9b6d6-1635771392 # {"$imagepolicy": "default:app-gitops"}
         port: 9080
         env:
           - name: DB_HOST
