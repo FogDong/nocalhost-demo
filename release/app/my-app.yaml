@@ -9,6 +9,11 @@ spec:
       properties:
         image: crccheck/hello-world # {"$imagepolicy": "default:app-gitops"}
         port: 9080
+        env:
+          - name: DB_HOST
+            value: mysql-cluster-mysql.default.svc.cluster.local:3306
+          - name: DB_USERNAME
+            value: root
       traits:
         - type: nocalhost
           properties:

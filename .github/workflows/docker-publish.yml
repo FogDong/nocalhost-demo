@@ -16,8 +16,10 @@ jobs:
   push:
     runs-on: ubuntu-latest
     env:
-      IMAGE: ghcr.io/fogdong/nocalhost-temo
-    if: "!contains(github.event.head_commit.message, 'Update image automatically')"
+      IMAGE: ghcr.io/fogdong/nocalhost-demo
+    if: |
+      !contains(github.event.head_commit.message, 'Update image automatically')" ||
+      !contains(github.event.head_commit.message, 'skip')"
 
     steps:
     - name: Generate build ID
