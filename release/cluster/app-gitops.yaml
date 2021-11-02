@@ -4,7 +4,7 @@ metadata:
   name: app-gitops
 spec:
   components:
-  - name: app-gitops
+  - name: app-config
     type: kustomize
     properties:
       repoType: git
@@ -12,7 +12,7 @@ spec:
       secretRef: git-secret
       pullInterval: 1m
       git:
-        branch: main
+        branch: master
       path: ./release/app
       imageRepository:
         image: ghcr.io/fogdong/nocalhost-demo
