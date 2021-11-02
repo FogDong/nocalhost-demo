@@ -1,0 +1,57 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: my-rds
+spec:
+  components:
+    - name: dev-db
+      type: alibaba-rds
+      properties:
+        instance_name: dev-db
+        account_name: dev
+        password: my-password
+        writeConnectionSecretToRef:
+          name: dev-db-conn
+    - name: prod-db
+      type: alibaba-rds
+      properties:
+        instance_name: prod-db
+        account_name: prod
+        password: my-password
+        writeConnectionSecretToRef:
+          name: prod-db-conn
+
+  workflow:
+    steps:
+      - name: deploy-dev-db
+        type: apply-component
+        properties:
+          component: dev-db
+      - name: dev-notification
+        type: webhook-notification
+        properties:
+          slack:
+            url:
+              fromSecret:
+                name: my-secret
+                key: slack
+            message:
+              text: "Successfully apply the database in dev cluster."
+
+      - name: manual-approval
+        type: suspend
+
+      - name: deploy-prod-db
+        type: apply-component
+        properties:
+          component: prod-db
+      - name: prod-notification
+        type: webhook-notification
+        properties:
+          slack:
+            url:
+              fromSecret:
+                name: my-secret
+                key: slack
+            message:
+              text: "Successfully apply the database in prod cluster."

@@ -11,15 +11,23 @@ spec:
         port: 9080
         env:
           - name: DB_HOST
-            value: mysql-cluster-mysql.default.svc.cluster.local:3306
-          - name: DB_USERNAME
-            value: root
+            valueFrom: 
+              secretKeyRef: 
+                name: dev-db-conn
+                key: DB_HOST
+          - name: DB_USER
+            valueFrom: 
+              secretKeyRef: 
+                name: dev-db-conn
+                key: DB_USER
       traits:
         - type: nocalhost
           properties:
             port: 9080
             gitUrl: https://github.com/FogDong/nocalhost-demo.git
             image: go
+            sync:
+              type: sendReceive
             debug:
               remoteDebugPort: 9009
         - type: ingress
@@ -53,8 +61,30 @@ spec:
                     - type: ingress
                       properties:
                         domain: prod.ca89a4a90fcd345029f1a89d36ecdc6f9.cn-hongkong.alicontainer.com
+
   workflow:
     steps:
+      - name: read-dev-secret
+        type: read-object
+        outputs:
+          - name: dev-secret-value
+            valueFrom: output.value.data
+        properties:
+          apiVersion: v1
+          kind: Secret
+          name: dev-db-conn
+      - name: apply-dev-secret
+        type: apply-object
+        inputs:
+          - from: dev-secret-value
+            parameterKey: value.data
+        properties:
+          value:
+            apiVersion: v1
+            kind: Secret
+            metadata:
+              name: dev-db-conn
+          cluster: cluster-dev
       - name: deploy-dev
         type: deploy2env
         properties:
@@ -74,6 +104,27 @@ spec:
       - name: manual-approval
         type: suspend
 
+      - name: read-prod-secret
+        type: read-object
+        outputs:
+          - name: prod-secret-value
+            valueFrom: output.value.data
+        properties:
+          apiVersion: v1
+          kind: Secret
+          name: prod-db-conn
+      - name: apply-prod-secret
+        type: apply-object
+        inputs:
+          - from: prod-secret-value
+            parameterKey: value.data
+        properties:
+          value:
+            apiVersion: v1
+            kind: Secret
+            metadata:
+              name: prod-db-conn
+          cluster: cluster-prod
       - name: deploy-prod
         type: deploy2env
         properties:
