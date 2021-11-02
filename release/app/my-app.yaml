@@ -55,17 +55,6 @@ spec:
               components:
                 - name: my-server
                   type: webservice
-                  env:
-                    - name: DB_HOST
-                      valueFrom: 
-                        secretKeyRef: 
-                          name: prod-db-conn
-                          key: DB_HOST
-                    - name: DB_USER
-                      valueFrom: 
-                        secretKeyRef: 
-                          name: prod-db-conn
-                          key: DB_USER
                   traits:
                     - type: ingress
                       properties:
@@ -129,7 +118,7 @@ spec:
             apiVersion: v1
             kind: Secret
             metadata:
-              name: prod-db-conn
+              name: dev-db-conn
           cluster: cluster-prod
       - name: deploy-prod
         type: deploy2env
