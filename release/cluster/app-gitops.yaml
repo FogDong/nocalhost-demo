@@ -4,7 +4,7 @@ metadata:
   name: app-gitops
 spec:
   components:
-  - name: app-config
+  - name: app-gitops
     type: kustomize
     properties:
       repoType: git
