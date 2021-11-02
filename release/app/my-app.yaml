@@ -7,17 +7,17 @@ spec:
     - name: my-server
       type: webservice
       properties:
-        image: ghcr.io/fogdong/nocalhost-demo:master-85e9b6d6-1635771392 # {"$imagepolicy": "default:app-gitops"}
+        image: ghcr.io/fogdong/nocalhost-demo:master-28917c57-1635860530 # {"$imagepolicy": "default:app-gitops"}
         port: 9080
         env:
           - name: DB_HOST
-            valueFrom: 
-              secretKeyRef: 
+            valueFrom:
+              secretKeyRef:
                 name: dev-db-conn
                 key: DB_HOST
           - name: DB_USER
-            valueFrom: 
-              secretKeyRef: 
+            valueFrom:
+              secretKeyRef:
                 name: dev-db-conn
                 key: DB_USER
       traits:
@@ -35,7 +35,6 @@ spec:
             domain: dev.cc502b2b97a5c4f16a1d01f9217926e85.cn-hongkong.alicontainer.com
             http:
               /: 9080
-
   policies:
     - name: multi-env-policy
       type: env-binding
@@ -48,7 +47,6 @@ spec:
             selector:
               components:
                 - my-server
-
           - name: prod
             placement:
               clusterSelector:
@@ -61,7 +59,6 @@ spec:
                     - type: ingress
                       properties:
                         domain: prod.ca89a4a90fcd345029f1a89d36ecdc6f9.cn-hongkong.alicontainer.com
-
   workflow:
     steps:
       - name: read-dev-secret
@@ -100,10 +97,8 @@ spec:
                 key: slack
             message:
               text: "Successfully apply the app in dev cluster."
-
       - name: manual-approval
         type: suspend
-
       - name: read-prod-secret
         type: read-object
         outputs:
