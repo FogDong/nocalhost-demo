@@ -1,0 +1,50 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: my-app
+  namespace: default
+spec:
+  components:
+  - name: my-app
+    properties:
+      image: ghcr.io/fogdong/nocalhost-demo:master-28917c57-1635860530
+    traits:
+    - properties:
+        replicas: 1
+      type: scaler
+    - properties:
+        command:
+          debug:
+          - sh
+          - debug.sh
+          run:
+          - sh
+          - run.sh
+        hotReload: true
+        image: go
+        port: 9080
+        resources:
+          limits:
+            cpu: "2"
+            memory: 2Gi
+        serviceType: deployment
+        shell: bash
+        sync:
+          filePattern:
+          - ./
+          ignoreFilePattern:
+          - .git
+          - .vscode
+          - .idea
+          - .gradle
+          - build
+          type: sendReceive
+        workDir: /home/nocalhost-dev
+      type: nocalhost
+    type: webservice
+  workflow:
+    steps:
+    - name: default
+      properties:
+        component: my-app
+      type: apply-component
