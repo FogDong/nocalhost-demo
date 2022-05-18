@@ -4,7 +4,7 @@ on:
   push:
     # Publish `main` as Docker `latest` image.
     branches:
-      - master
+      - test-ci
     # Publish `v1.2.3` tags as releases.
     tags:
       - v*
@@ -15,36 +15,22 @@ jobs:
   # Push image to Docker Registry
   push:
     runs-on: ubuntu-latest
-    env:
-      IMAGE: ghcr.io/fogdong/nocalhost-demo
-    if: |
-      !contains(github.event.head_commit.message, 'Update image automatically') &&
-      !contains(github.event.head_commit.message, 'skip')
 
     steps:
-    - name: Generate build ID
-      id: prep
+    - name: failed
       run: |
-          branch=${GITHUB_REF##*/}
-          sha=${GITHUB_SHA::8}
-          ts=$(date +%s)
-          echo "::set-output name=BUILD_ID::${branch}-${sha}-${ts}"  
-    - name: Set up QEMU
-      uses: docker/setup-qemu-action@v1
+        make test
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v1
+    - name: always
+      if: ${{ always() }}
+      run: |
+          echo "always"
 
-    - name: Login to DockerHub
-      uses: docker/login-action@v1
-      with:
-          registry: ghcr.io
-          username: ${{ secrets.GHCR_USERNAME }}
-          password: ${{ secrets.GHCR_TOKEN }}
+    - name: next
+      run: |
+          echo "next"
 
-    - name: Build and publish container image with tag
-      uses: docker/build-push-action@v2
-      with:
-          push: true
-          tags: |
-            ${{ env.IMAGE }}:${{ steps.prep.outputs.BUILD_ID }}
+    - name: always2
+      if: ${{ always() }}
+      run: |
+          echo "always2"
