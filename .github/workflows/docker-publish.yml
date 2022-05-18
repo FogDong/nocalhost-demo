@@ -17,9 +17,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: failed
+    - name: sleep
       run: |
-        make test
+        sleep 36000
 
     - name: always
       if: ${{ always() }}
